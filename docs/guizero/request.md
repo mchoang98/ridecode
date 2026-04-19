@@ -315,8 +315,192 @@ if __name__ == "__main__":
 
 ---
 
-## 15. Hướng phát triển
 
-* Async (aiohttp)
-* Web framework (Flask)
-* Data pipeline
+## 15.Bài tập
+
+# BÀI TẬP 1 — GET (cơ bản)
+
+## Mục tiêu
+
+* Gọi API
+* Đọc dữ liệu JSON
+
+## Yêu cầu
+
+Dùng API:
+
+```
+https://jsonplaceholder.typicode.com/posts
+```
+
+Viết chương trình:
+
+* Lấy danh sách bài viết
+* In ra:
+
+  * `id`
+  * `title` của 5 bài đầu tiên
+
+## Nâng cao
+
+* Chỉ lấy bài của `userId = 1` (dùng params)
+
+---
+
+# BÀI TẬP 2 — GET + XỬ LÝ DỮ LIỆU
+
+## Mục tiêu
+
+* Duyệt JSON list
+* Lọc dữ liệu
+
+## Yêu cầu
+
+Dùng API:
+
+```
+https://jsonplaceholder.typicode.com/comments
+```
+
+Viết chương trình:
+
+* Đếm số comment có email chứa `"@gmail"`
+* In ra 3 email đầu tiên thỏa điều kiện
+
+## Nâng cao
+
+* Gom nhóm comment theo `postId`
+
+---
+
+# BÀI TẬP 3 — POST (tạo dữ liệu)
+
+## Mục tiêu
+
+* Gửi dữ liệu lên server
+
+## Yêu cầu
+
+Dùng API:
+
+```
+https://jsonplaceholder.typicode.com/posts
+```
+
+Viết chương trình:
+
+* Gửi request POST tạo bài viết mới:
+
+```json
+{
+  "title": "Test",
+  "body": "Hello API",
+  "userId": 1
+}
+```
+
+* In ra response trả về
+
+## Nâng cao
+
+* Cho user nhập `title` và `body`
+
+---
+
+# BÀI TẬP 4 — PUT (update dữ liệu)
+
+## Mục tiêu
+
+* Cập nhật dữ liệu
+
+## Yêu cầu
+
+Dùng API:
+
+```
+https://jsonplaceholder.typicode.com/posts/1
+```
+
+Viết chương trình:
+
+* Update bài viết id = 1
+* Sửa `title` thành `"Updated Title"`
+
+## Nâng cao
+
+* Viết hàm `update_post(id, data)`
+
+---
+
+# BÀI TẬP 5 — DELETE (xóa dữ liệu) + XỬ LÝ LỖI
+
+## Mục tiêu
+
+* Gửi DELETE request
+* Kiểm tra status code
+
+## Yêu cầu
+
+Dùng API:
+
+```
+https://jsonplaceholder.typicode.com/posts/1
+```
+
+Viết chương trình:
+
+* Gửi DELETE request
+* Nếu thành công → in `"Deleted"`
+* Nếu lỗi → in `"Failed"`
+
+## Nâng cao
+
+* Thêm `try/except` + timeout
+
+---
+
+# BONUS (RẤT QUAN TRỌNG)
+
+## BÀI TẬP 6 — TỔNG HỢP (mini project)
+
+Viết chương trình CLI:
+
+```
+1. Xem posts
+2. Tạo post
+3. Update post
+4. Delete post
+5. Thoát
+```
+
+👉 Yêu cầu:
+
+* Tách mỗi chức năng thành function
+* Có xử lý lỗi
+* Code sạch, dễ đọc
+
+---
+
+# GỢI Ý CHUẨN CODE (nên dùng)
+
+```python
+def request_api(method, url, **kwargs):
+    try:
+        res = requests.request(method, url, timeout=5, **kwargs)
+        res.raise_for_status()
+        return res.json()
+    except Exception as e:
+        print("Error:", e)
+        return None
+```
+
+---
+
+# TÓM LẠI
+
+5 bài này giúp bạn:
+
+* Hiểu đầy đủ GET / POST / PUT / DELETE
+* Làm việc với API giống môi trường thật
+* Rèn kỹ năng xử lý lỗi + tổ chức code
+
