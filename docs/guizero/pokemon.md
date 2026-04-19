@@ -1,3 +1,5 @@
+https://pokeapi.co/
+
 # ⚔️ SPEC NGẮN GỌN: Skill – Hệ – Chỉ số
 
 ## 1. Chỉ số Pokémon
