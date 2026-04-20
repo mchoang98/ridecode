@@ -7,86 +7,245 @@
 * Lấy và xử lý skill
 
 ---
+Dưới đây là phiên bản **API chi tiết hơn (dựa trên docs + GitHub của PokéAPI)** nhưng vẫn giữ dạng dropdown gọn:
 
-## 📡 API (gộp)
+---
+
+## 📡 API (chi tiết)
 
 <details>
-<summary><b>Xem hướng dẫn API</b></summary>
+<summary><b>Xem hướng dẫn API chi tiết</b></summary>
 
-### 1. Pokémon
-
-```http
-GET /pokemon/{name}
-```
-
-Lấy:
+## 1. Base URL
 
 ```text
-name
-HP      (stats.hp)
-ATK     (stats.attack)
-DEF     (stats.defense)
-TYPE    (types[0])
-moves
+https://pokeapi.co/api/v2/
+```
+
+* REST API, trả về JSON
+* Không cần auth, dùng trực tiếp được ([Open Public APIs][1])
+
+---
+
+## 2. Endpoint: Pokémon
+
+```http
+GET /pokemon/{id or name}
+```
+
+Ví dụ:
+
+```http
+GET /pokemon/pikachu
+GET /pokemon/25
 ```
 
 ---
 
-### 2. Move (Skill)
+### Cấu trúc response (rút gọn)
 
-```http
-GET /move/{id}
-```
-
-Lấy:
-
-```text
-name
-power
-accuracy
-type
-```
-
----
-
-### 3. Chuẩn hóa dữ liệu
-
-**Pokémon**
-
-```python
+```json
 {
-  "name": str,
-  "HP": int,
-  "ATK": int,
-  "DEF": int,
-  "TYPE": str,
-  "moves": list
-}
-```
-
-**Move**
-
-```python
-{
-  "name": str,
-  "power": int,
-  "type": str,
-  "accuracy": float
+  "name": "pikachu",
+  "stats": [...],
+  "types": [...],
+  "moves": [...],
+  "abilities": [...],
+  "sprites": {...}
 }
 ```
 
 ---
 
-### 4. Lưu ý
+### Các field quan trọng
 
-* Chỉ lấy 2–4 moves
-* Mỗi move cần gọi API riêng
-* Có thể gặp:
+#### Stats
 
-  * `power = null`
-  * `accuracy = null`
+```json
+{
+  "base_stat": 55,
+  "stat": { "name": "attack" }
+}
+```
+
+👉 Map:
+
+```text
+hp       → HP
+attack   → ATK
+defense  → DEF
+```
+
+---
+
+#### Type
+
+```json
+{
+  "type": { "name": "electric" }
+}
+```
+
+👉 Có thể có nhiều type, thường lấy `[0]`
+
+---
+
+#### Moves
+
+```json
+{
+  "move": {
+    "name": "thunder-shock",
+    "url": "https://pokeapi.co/api/v2/move/84/"
+  }
+}
+```
+
+👉 Quan trọng:
+
+* Không có `power`, `accuracy` ở đây
+* Chỉ có **link → phải gọi tiếp API**
+
+---
+
+## 3. Endpoint: Move
+
+```http
+GET /move/{id or name}
+```
+
+Ví dụ:
+
+```http
+GET /move/84
+GET /move/thunder-shock
+```
+
+---
+
+### Cấu trúc response (rút gọn)
+
+```json
+{
+  "name": "thunder-shock",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 30,
+  "type": { "name": "electric" }
+}
+```
+
+---
+
+### Field quan trọng
+
+```text
+name       → tên skill
+power      → damage base
+accuracy   → % trúng
+type       → hệ
+```
+
+---
+
+### Lưu ý quan trọng
+
+* `power` có thể = null
+* `accuracy` có thể = null
+* Có nhiều field không cần dùng (pp, effect, meta...) ([pokeapi.co][2])
+
+---
+
+## 4. Pagination (list Pokémon)
+
+```http
+GET /pokemon?limit=20&offset=0
+```
+
+Response:
+
+```json
+{
+  "count": 1281,
+  "results": [
+    { "name": "bulbasaur", "url": "..." }
+  ]
+}
+```
+
+👉 Pattern:
+
+* API trả **name + url**
+* Muốn chi tiết → gọi tiếp từng `url`
+
+➡️ Đây là thiết kế phổ biến để tránh trả quá nhiều data một lần ([Open Public APIs][1])
+
+---
+
+## 5. Cách API hoạt động (quan trọng)
+
+PokéAPI dùng mô hình:
+
+```text
+List endpoint → trả danh sách (nhẹ)
+Detail endpoint → trả chi tiết (nặng)
+```
+
+Ví dụ:
+
+```text
+/pokemon → list
+/pokemon/{id} → detail
+/move/{id} → detail move
+```
+
+👉 Nghĩa là:
+
+* Luôn phải gọi **nhiều request**
+* Client phải tự combine data
+
+---
+
+## 6. Resource liên quan (tham khảo thêm)
+
+PokéAPI có rất nhiều endpoint:
+
+```text
+/pokemon
+/move
+/type
+/ability
+/item
+/location
+```
+
+→ Tất cả đều theo cùng pattern ([pokeapi.co][3])
+
+---
+
+## 7. Wrapper (nếu không muốn gọi raw API)
+
+Có thư viện chính thức:
+
+* Python: `pokebase`
+* JS: `pokedex-promise-v2`
+
+→ có caching sẵn ([GitHub][4])
+
+---
+
+## 8. Tóm tắt nhanh
+
+```text
+/pokemon/{name} → stats, type, moves (chỉ link)
+/move/{id}      → power, accuracy, type
+/pokemon        → list (pagination)
+```
+
+---
 
 </details>
+
 
 ---
 
